@@ -1,0 +1,62 @@
+package com.airtribe.meditrack.service;
+
+import com.airtribe.meditrack.entity.Doctor;
+import com.airtribe.meditrack.enums.Specialization;
+import com.airtribe.meditrack.exception.DuplicateException;
+import com.airtribe.meditrack.exception.InvalidDataException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class DoctorService {
+  private static DoctorService instance;
+  private Map<String, Doctor> doctorMap=new HashMap<>();
+  private DoctorService(){}
+  public static DoctorService getInstance()
+  {
+    if(instance==null)
+    {
+      instance=new DoctorService();
+    }
+    return instance;
+  }
+  public void addDoctor(Doctor doctor)
+  {
+    if(doctor==null) {
+      throw new InvalidDataException("Doctor data invalid");
+    }
+    if(doctor.getId()==null||doctor.getId().isEmpty())
+    {
+      throw new InvalidDataException("Doctor Id cannot be empty");
+    }
+    if(doctorMap.containsKey(doctor.getId()))
+    {
+      throw new DuplicateException("Doctor already exists: "+doctor.getId());
+    }
+    doctorMap.put(doctor.getId(), doctor);
+  }
+  public List<Doctor> getAllDoctors()
+  {
+    return new ArrayList<>(doctorMap.values());
+  }
+  public List<Doctor>findBySpecialization(Specialization specialization)
+  {
+    if(specialization==null)
+    {
+      throw new InvalidDataException("Specialization cannot be null");
+    }
+    return doctorMap.values().stream().filter(spec->spec.getSpecialization()==specialization)
+            .collect(Collectors.toList());
+  }
+  public void removeDoctor(String id)
+  {
+    if(!doctorMap.containsKey(id))
+    {
+      throw new InvalidDataException("Doctor not found");
+    }
+    doctorMap.remove(id);
+  }
+}
