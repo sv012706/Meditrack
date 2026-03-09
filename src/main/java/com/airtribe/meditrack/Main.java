@@ -30,7 +30,9 @@ public class Main {
   private static AppointmentService appointmentService =
           new AppointmentService(new StandardBillingStrategy());
 
+
   public static void main(String[] args) {
+    doctorService.loadDoctorsFromCSV();
    System.out.println(Constants.App_Name);
        while (true) {
 
@@ -76,6 +78,7 @@ public class Main {
                break;
 
              case MenuOptions.Exit:
+               doctorService.saveDoctorsToCSV();
                logger.info("Exiting MediTrack...");
                return;
 
@@ -125,6 +128,7 @@ public class Main {
        doctorService.addDoctor(doctor);
 
        logger.info("Doctor added successfully!"+doctor.getId());
+
 
      }
 

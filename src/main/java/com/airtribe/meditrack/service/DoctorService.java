@@ -1,9 +1,11 @@
 package com.airtribe.meditrack.service;
 
+import com.airtribe.meditrack.constants.Constants;
 import com.airtribe.meditrack.entity.Doctor;
 import com.airtribe.meditrack.enums.Specialization;
 import com.airtribe.meditrack.exception.DuplicateException;
 import com.airtribe.meditrack.exception.InvalidDataException;
+import com.airtribe.meditrack.util.CSVUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,5 +60,51 @@ public class DoctorService {
       throw new InvalidDataException("Doctor not found");
     }
     doctorMap.remove(id);
+  }
+  public void saveDoctorsToCSV() {
+    try {
+      List<String> lines = new ArrayList<>();
+      for (Doctor d : doctorMap.values()) {
+        String line =
+                d.getId() + "," +
+                        d.getName() + "," +
+                        d.getAge() + "," +
+                        d.getSpecialization() + "," +
+                        d.getConsultationFees();
+        lines.add(line);
+      }
+      CSVUtil.writeCSV(Constants.doctorFile, lines);
+
+    } catch (Exception e) {
+      System.out.println("Error saving doctors: " + e.getMessage());
+
+    }
+  }
+    public void loadDoctorsFromCSV() {
+
+      try {
+
+        List<String[]> data = CSVUtil.readCSV(Constants.doctorFile);
+
+        for(String[] row : data){
+
+          Doctor doctor = new Doctor(
+                  row[0],
+                  row[1],
+                  Integer.parseInt(row[2]),
+                  Specialization.valueOf(row[3]),
+                  Double.parseDouble(row[4])
+          );
+
+          doctorMap.put(doctor.getId(), doctor);
+        }
+
+      }
+      catch(Exception e){
+
+        System.out.println("Error loading doctors");
+
+
+      }
   }
 }
